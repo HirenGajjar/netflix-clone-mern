@@ -1,11 +1,12 @@
 import { UserModel } from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
+import { generateTokenAndSendCookie } from "../utils/generateToken.js";
 //
 export const signupController = async (req, res) => {
   try {
     // Get the data from request
     const { email, password, username } = await req.body;
-    console.log(email, password, username);
+
     // Check if all the fields are not empty
     if (!email || !password || !username) {
       return res.status(400).json({
@@ -64,12 +65,13 @@ export const signupController = async (req, res) => {
       password: hashedPassword,
       image,
     });
+    // generate token and save the user into DB and send the response
+    generateTokenAndSendCookie(newUser._id, res);
     await newUser.save();
     // Send response
     res.status(201).json({
       success: true,
       user: { ...newUser._doc, password: "" },
-      message: "User created successfully!",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal server error!" });
