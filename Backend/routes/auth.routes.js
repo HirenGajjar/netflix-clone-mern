@@ -7,10 +7,10 @@ import {
 //
 const route = express.Router();
 //
-route.get("/signup", signupController);
+route.post("/signup", signupController);
 //
-route.get("/login", loginController);
+route.post("/login", loginController);
 //
-route.get("/logout", logoutController);
+route.post("/logout", logoutController);
 //
 export default route;

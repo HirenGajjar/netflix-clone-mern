@@ -1,11 +1,87 @@
+import { UserModel } from "../models/user.model.js";
+import bcryptjs from "bcryptjs";
+//
 export const signupController = async (req, res) => {
-  res.send("Signup");
+  try {
+    // Get the data from request
+    const { email, password, username } = await req.body;
+    console.log(email, password, username);
+    // Check if all the fields are not empty
+    if (!email || !password || !username) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required!",
+      });
+    }
+    // Check email using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email address!" });
+    }
+    //Check the length of password, it must be > 6
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password should have at least 6 characters!",
+      });
+    }
+
+    // Hash the password before saving it
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
+    //Check if the email already exists
+
+    const existingUserByEmail = await UserModel.findOne({ email });
+
+    if (existingUserByEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists!",
+      });
+    }
+    // Check for the username
+    const existingUserByUsername = await UserModel.findOne({
+      username: username,
+    });
+    if (existingUserByUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "Username is unavailable!",
+      });
+    }
+    //Add random image
+    const PROFILE_IMAGES = ["/avatar1.png", "/avatar2.png", "/avatar3.png"];
+    //Choose a random image
+    const image =
+      PROFILE_IMAGES[Math.floor(Math.random() * PROFILE_IMAGES.length)];
+
+    // If everything is good then create a new user
+    const newUser = new UserModel({
+      email,
+      username,
+      password: hashedPassword,
+      image,
+    });
+    await newUser.save();
+    // Send response
+    res.status(201).json({
+      success: true,
+      user: { ...newUser._doc, password: "" },
+      message: "User created successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
 };
 //
 export const loginController = async (req, res) => {
-  res.send("login");
+  try {
+  } catch (error) {}
 };
 //
 export const logoutController = async (req, res) => {
-  res.send("logout");
+  try {
+  } catch (error) {}
 };
