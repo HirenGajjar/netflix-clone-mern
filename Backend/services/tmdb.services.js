@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ENV_VARIABLE } from "../config/envVars";
+import { ENV_VARIABLE } from "../config/envVars.js";
 //
 export const fetchFromMovieDataBase = async (url) => {
   const options = {
@@ -8,11 +8,8 @@ export const fetchFromMovieDataBase = async (url) => {
       Authorization: "Bearer " + ENV_VARIABLE.TMDB_API_KEY,
     },
   };
-  const response = await axios.get(
-    "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1",
-    options
-  );
-  if (response.statusCode !== 200) {
+  const response = await axios.get(url, options);
+  if (response.status !== 200) {
     throw new Error(
       `Failed to fetch data from TMDB API: ${response.statusText}`
     );
