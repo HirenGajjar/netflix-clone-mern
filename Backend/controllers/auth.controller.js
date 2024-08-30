@@ -80,7 +80,40 @@ export const signupController = async (req, res) => {
 //
 export const loginController = async (req, res) => {
   try {
-  } catch (error) {}
+    //Check for email and password are provided
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required!" });
+    }
+    // Check in DB for email
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials!" });
+    }
+    //Check for the password
+    const correctPassword = await bcryptjs.compare(password, user.password);
+    if (!correctPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials!" });
+    }
+    // Generate the token and cookie
+    generateTokenAndSendCookie(user._id, res);
+    // Send response
+    res.status(200).json({
+      success: true,
+      user: {
+        ...user._doc,
+        password: "",
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
 };
 //
 export const logoutController = async (req, res) => {
