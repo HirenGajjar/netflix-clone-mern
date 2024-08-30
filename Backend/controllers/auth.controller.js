@@ -85,5 +85,9 @@ export const loginController = async (req, res) => {
 //
 export const logoutController = async (req, res) => {
   try {
-  } catch (error) {}
+    res.clearCookie("jwt-netflix-clone-token");
+    res.status(200).json({ success: true, message: "Logged out!" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
 };
