@@ -42,3 +42,18 @@ export const movieDetailsController = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error!" });
   }
 };
+
+export const movieSimilarController = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const data = await fetchFromMovieDataBase(
+      `https://api.themoviedb.org/3/movie/${id}/similar?language=en-US&page=1`
+    );
+    res.status(200).json({ success: true, similar: data.results });
+  } catch (error) {
+    if (error.message.includes("404")) {
+      res.status(404).send(null);
+    }
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
+};
