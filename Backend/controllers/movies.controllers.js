@@ -57,3 +57,18 @@ export const movieSimilarController = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error!" });
   }
 };
+// Here category means 1.Popular 2.Top_rated 3. Now playing 4.Upcoming
+export const moviesByCategoriesController = async (req, res) => {
+  const { category } = req.params;
+  try {
+    const data = await fetchFromMovieDataBase(
+      `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=1`
+    );
+    res.status(200).json({ success: true, movies: data.results });
+  } catch (error) {
+    if (error.message.includes("404")) {
+      res.status(404).send(null);
+    }
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
+};
